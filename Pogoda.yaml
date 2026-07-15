@@ -9,7 +9,7 @@ esp32:
 
 # Konfiguracja Wi-Fi (wpisz swoje dane)
 wifi:
-  ssid: "ESPtest"
+  ssid: "ESPTest"
   password: "12345678"
   
   ap:
