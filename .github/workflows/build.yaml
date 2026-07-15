@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Pobranie kodu
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Instalacja ESPHome
         run: pip install esphome
@@ -16,7 +16,7 @@ jobs:
         run: esphome compile Pogoda.yaml
         
       - name: Udostepnienie pliku bin
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: plik-do-wgrania
           path: .esphome/build/ekran-pogodowy/.pioenvs/ekran-pogodowy/firmware.bin
