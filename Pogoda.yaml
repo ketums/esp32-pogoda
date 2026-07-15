@@ -7,7 +7,7 @@ esp32:
   framework:
     type: esp-idf
 
-# Konfiguracja Wi-Fi (uzupełnij swoje dane)
+# Konfiguracja Wi-Fi (wpisz swoje dane)
 wifi:
   ssid: "ESPtest"
   password: "12345678"
@@ -15,25 +15,18 @@ wifi:
   ap:
     ssid: "Ekran-Pogodowy-Awaryjny"
 
-# Włączenie obsługi HTTP z automatycznym wsparciem dla JSON
-http_request:
-  useragent: esphome/device
-  timeout: 10s
-
-# Logowanie i serwer WWW
+# Standardowe logowanie
 logger:
+
+# Serwer WWW - pozwoli Ci wejsc na IP płytki z telefonu i sprawdzić status
 web_server:
   port: 80
 
-# Czysty sensor, który pobiera temperaturę całkowicie automatycznie!
-sensor:
-  - platform: http_request
-    name: "Temperatura zewnętrzna"
-    id: temp_zewnetrzna
-    url: "https://api.open-meteo.com/v1/forecast?latitude=54.5392&longitude=17.7501&current=temperature_2m"
-    update_interval: 15min
-    unit_of_measurement: "°C"
-    accuracy_decimals: 1
-    # ESPHome sam wyciągnie wartość z JSON-a za pomocą tej ścieżki:
-    json_path: "$.current.temperature_2m"
-    
+# Czysty sensor tekstowy, który nie potrzebuje żadnych wtyczek internetowych
+text_sensor:
+  - platform: template
+    name: "Status Urzadzenia"
+    id: status_urzadzenia
+    lambda: |-
+      return {"Ekran działa standalone!"};
+      
