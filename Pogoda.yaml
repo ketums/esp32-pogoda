@@ -36,4 +36,3 @@ text_sensor:
     id: status_urzadzenia
     lambda: |-
       return {"Ekran dziala standalone!"};
-      
