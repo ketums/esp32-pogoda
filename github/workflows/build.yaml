@@ -1,0 +1,22 @@
+name: Kompilacja ESPHome
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pobranie kodu
+        uses: actions/checkout@v3
+      
+      - name: Instalacja ESPHome
+        run: pip install esphome
+        
+      - name: Kompilacja pliku konfiguracyjnego
+        run: esphome compile Pogoda.yaml
+        
+      - name: Udostepnienie pliku bin
+        uses: actions/upload-artifact@v3
+        with:
+          name: plik-do-wgrania
+          path: .esphome/build/ekran-pogodowy/.pioenvs/ekran-pogodowy/firmware.bin
