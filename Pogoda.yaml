@@ -4,29 +4,36 @@ esphome:
 
 esp32:
   board: esp32-s3-devkitc-1
+  variant: esp32s3
   framework:
     type: esp-idf
+  # Konfiguracja pamięci i taktowania dedykowana dla Waveshare ESP32-S3 RGB
+  board_build:
+    flash_mode: qio
+    f_flash: 80mhz
+    f_cpu: 240mhz
 
-# Konfiguracja Wi-Fi (wpisz swoje dane)
+# Konfiguracja Wi-Fi dopasowana do Twojego hotspotu w telefonie
 wifi:
   ssid: "ESPTest"
   password: "12345678"
   
+  # Awaryjny punkt dostępowy, gdyby płytka nie mogła połączyć się z telefonem
   ap:
     ssid: "Ekran-Pogodowy-Awaryjny"
 
-# Standardowe logowanie
+# Logowanie zdarzeń
 logger:
 
-# Serwer WWW - pozwoli Ci wejsc na IP płytki z telefonu i sprawdzić status
+# Serwer WWW do podglądu statusu przez przeglądarkę na telefonie
 web_server:
   port: 80
 
-# Czysty sensor tekstowy, który nie potrzebuje żadnych wtyczek internetowych
+# Czysty sensor tekstowy bez skomplikowanego kodu C++ do testu połączenia
 text_sensor:
   - platform: template
     name: "Status Urzadzenia"
     id: status_urzadzenia
     lambda: |-
-      return {"Ekran działa standalone!"};
+      return {"Ekran dziala standalone!"};
       
