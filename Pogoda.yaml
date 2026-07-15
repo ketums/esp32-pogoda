@@ -7,7 +7,7 @@ esp32:
   framework:
     type: esp-idf
 
-# Konfiguracja Wi-Fi (uzupełnij swoje dane)
+# Konfiguracja Wi-Fi (uzupelnij swoje dane)
 wifi:
   ssid: "ESPtest"
   password: "12345678"
@@ -25,26 +25,33 @@ logger:
 web_server:
   port: 80
 
-# Definiujemy sensor tekstowy, który będzie przechowywał naszą temperaturę
+# Definiujemy sensor tekstowy, który przechowa temperaturę
 text_sensor:
   - platform: template
     name: "Temperatura zewnętrzna"
     id: temp_zewnetrzna
 
-# Skrypt uruchamiany co 15 minut pobierający dane i aktualizujący sensor
+# Skrypt pobierający dane bez używania skomplikowanego kodu lambda
 interval:
   - interval: 15min
     then:
       - http_request.get:
           url: "https://api.open-meteo.com/v1/forecast?latitude=54.5392&longitude=17.7501&current=temperature_2m"
-          headers:
+          # Zmieniono 'headers' na 'request_headers' zgodnie z logiem błędu!
+          request_headers:
             Accept: "application/json"
           on_response:
             then:
               - lambda: |-
-                  auto json = json::parse(response);
-                  if (json.contains("current")) {
-                    std::string temp = json["current"]["temperature_2m"].dump();
-                    id(temp_zewnetrzna).publish_state(temp + " °C");
-                  }
+                  // Bezpieczne parsowanie JSON bez użycia zewnętrznych struktur
+                  json::parse_json(response, [](jsonObject root) -> bool {
+                    if (root.containsKey("current")) {
+                      jsonObject current = root["current"];
+                      if (current.containsKey("temperature_2m")) {
+                        double temp = current["temperature_2m"];
+                        id(temp_zewnetrzna).publish_state(str_snprintf("%.1f °C", 6, temp));
+                      }
+                    }
+                    return true;
+                  });
                   
