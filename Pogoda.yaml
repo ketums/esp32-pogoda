@@ -31,7 +31,7 @@ text_sensor:
     name: "Temperatura zewnętrzna"
     id: temp_zewnetrzna
 
-# Skrypt pobierający dane co 15 minut
+# Skrypt pobierający dane co 15 minut i dekodujący JSON oficjalną metodą ESPHome
 interval:
   - interval: 15min
     then:
@@ -41,19 +41,15 @@ interval:
             Accept: "application/json"
           on_response:
             then:
-              - lambda: |-
-                  // Pobieramy treść odpowiedzi jako czysty tekst za pomocą wbudowanej metody get_string()
-                  std::string resp_str = response->get_string();
-                  
-                  // Bezpiecznie wyszukujemy temperaturę w tekście
-                  std::string search_str = "\"temperature_2m\":";
-                  size_t pos = resp_str.find(search_str);
-                  if (pos != std::string::npos) {
-                    std::string val = resp_str.substr(pos + search_str.length());
-                    size_t end_pos = val.find_first_of(",}");
-                    if (end_pos != std::string::npos) {
-                      std::string temp = val.substr(0, end_pos);
-                      id(temp_zewnetrzna).publish_state(temp + " °C");
-                    }
-                  }
-                  
+              - json.parse:
+                  json: !lambda 'return response->get_string();' # Ta uproszczona lambda jest wbudowana i akceptowana przez ESPHome
+                  then:
+                    - lambda: |-
+                        if (root.containsKey("current")) {
+                          auto current = root["current"];
+                          if (current.containsKey("temperature_2m")) {
+                            float temp = current["temperature_2m"];
+                            id(temp_zewnetrzna).publish_state(str_snprintf("%.1f °C", 10, temp));
+                          }
+                        }
+                        
