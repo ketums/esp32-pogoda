@@ -1,0 +1,29 @@
+esphome:
+  name: ekran-pogodowy
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  framework:
+    type: esp-idf
+
+wifi:
+  ssid: "ESPtest"
+  password: "12345678"
+
+time:
+  - platform: sntp
+    id: czas_z_internetu
+    timezone: "Europe/Warsaw"
+
+weather:
+  - platform: openweathermap
+    id: pogoda_z_sieci
+    api_key: "TUTAJ_WKLEJ_TWÓJ_KLUCZ_API"
+    latitude: 54.5392
+    longitude: 17.7501
+
+display:
+  - platform: rgb565
+    id: my_display
+    # UWAGA: Tu w wolnej chwili uzupełnimy piny dla Twojej magistrali RGB w Waveshare.
