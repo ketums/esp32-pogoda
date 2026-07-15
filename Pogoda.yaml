@@ -9,7 +9,7 @@ esp32:
 
 # Konfiguracja polaczenia Wi-Fi
 wifi:
-  ssid: "TUTAJ_WPISZ_NAZWE_SWOJEGO_WIFI"
+  ssid: "ESPtest"
   password: "12345678"
   
   # Automatyczny punkt dostepowy w razie awarii Wi-Fi
@@ -22,15 +22,9 @@ api:
 # Logowanie zdarzen (przydatne do debugowania)
 logger:
 
-# Komponent pobierajacy dane pogodowe z OpenWeatherMap
+# Pobieranie stanu pogody bezpośrednio z Home Assistant
 text_sensor:
-  - platform: openweathermap
-    id: pogoda_z_sieci
-    api_key: "43f603e0b341be3dc59f463a6ea78716"
-    latitude: 54.5392
-    longitude: 17.7501
-    update_interval: 30min
-
-# Przykladowa sekcja wyswietlacza RGB dla Waveshare ESP32-S3
-display:
-  - platform: esp32_camera
+  - platform: homeassistant
+    id: stan_pogody
+    entity_id: weather.home # <--- Tutaj wpisujesz nazwe encji pogodowej ze swojego Home Assistant
+    
