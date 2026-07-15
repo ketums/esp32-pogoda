@@ -7,7 +7,7 @@ esp32:
   framework:
     type: esp-idf
 
-# Konfiguracja Wi-Fi (podaj swoje prawdziwe dane)
+# Konfiguracja Wi-Fi (uzupelnij swoje dane)
 wifi:
   ssid: "ESPtest"
   password: "12345678"
@@ -15,42 +15,25 @@ wifi:
   ap:
     ssid: "Ekran-Pogodowy-Awaryjny"
 
-# Włączenie obsługi zapytań HTTP (potrzebne do pobrania pogody)
+# Poprawiona sekcja HTTP (useragent pisany lacznie)
 http_request:
-  user_agent: esphome/device
+  useragent: esphome/device
   timeout: 10s
 
-# Logowanie i serwer WWW, żebyś mógł podejrzeć działanie w przeglądarce
+# Logowanie i serwer WWW
 logger:
 web_server:
   port: 80
 
-# Sensory pobierające temperaturę bezpośrednio z Open-Meteo
+# Pobieranie temperatury z Open-Meteo i automatyczne wyciąganie jej z formatu JSON
 sensor:
-  - platform: template
+  - platform: http_request
     name: "Temperatura zewnętrzna"
     id: temp_zewnetrzna
+    url: "https://api.open-meteo.com/v1/forecast?latitude=54.5392&longitude=17.7501&current=temperature_2m"
+    update_interval: 15min
     unit_of_measurement: "°C"
     accuracy_decimals: 1
-    update_interval: 15min
-    lambda: |-
-      return id(temp_zewnetrzna).state;
-
-# Skrypt, który co 15 minut pobiera dane pogodowe z internetu i wyciąga z nich temperaturę
-interval:
-  - interval: 15min
-    then:
-      - http_request.get:
-          url: "https://api.open-meteo.com/v1/forecast?latitude=54.5392&longitude=17.7501&current=temperature_2m"
-          headers:
-            Accept: "application/json"
-          handler:
-            # Ten fragment kodu odczytuje temperaturę z otrzymanego pliku JSON
-            on_resolve:
-              - lambda: |-
-                  auto json = json::parse(response);
-                  if (json.contains("current")) {
-                    float temp = json["current"]["temperature_2m"];
-                    id(temp_zewnetrzna).publish_state(temp);
-                  }
-                  
+    # Ten parametr automatycznie wchodzi w głąb struktury JSON i wyciąga wartość
+    json_path: "$.current.temperature_2m"
+    
