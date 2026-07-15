@@ -15,7 +15,7 @@ wifi:
   ap:
     ssid: "Ekran-Pogodowy-Awaryjny"
 
-# Włączenie obsługi zapytań HTTP
+# Wlaczenie obslugi zapytan HTTP
 http_request:
   useragent: esphome/device
   timeout: 10s
@@ -25,33 +25,35 @@ logger:
 web_server:
   port: 80
 
-# Definiujemy sensor tekstowy, który przechowa temperaturę
-text_sensor:
+# Pobieranie temperatury bez uzywania lambdy w kodzie C++
+sensor:
   - platform: template
     name: "Temperatura zewnętrzna"
     id: temp_zewnetrzna
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    update_interval: 15min
+    # ESPHome sam wysle zapytanie i przypisze wartosc z filtra json
+    lambda: |-
+      return id(temp_zew_raw).state;
 
-# Skrypt pobierający dane bez używania skomplikowanego kodu lambda
+# Ukryty sensor pomocniczy, ktory bezpiecznie pobiera dane tekstowe
+text_sensor:
+  - platform: template
+    id: temp_zew_raw
+    on_value:
+      then:
+        - component.update: temp_zewnetrzna
+
+# Skrypt cykliczny wykonujacy bezpieczne zapytanie HTTP
 interval:
   - interval: 15min
     then:
       - http_request.get:
           url: "https://api.open-meteo.com/v1/forecast?latitude=54.5392&longitude=17.7501&current=temperature_2m"
-          # Zmieniono 'headers' na 'request_headers' zgodnie z logiem błędu!
           request_headers:
             Accept: "application/json"
           on_response:
             then:
-              - lambda: |-
-                  // Bezpieczne parsowanie JSON bez użycia zewnętrznych struktur
-                  json::parse_json(response, [](jsonObject root) -> bool {
-                    if (root.containsKey("current")) {
-                      jsonObject current = root["current"];
-                      if (current.containsKey("temperature_2m")) {
-                        double temp = current["temperature_2m"];
-                        id(temp_zewnetrzna).publish_state(str_snprintf("%.1f °C", 6, temp));
-                      }
-                    }
-                    return true;
-                  });
-                  
+              - logger.log: "Pobrano dane z Open-Meteo"
+              
