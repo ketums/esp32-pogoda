@@ -42,10 +42,10 @@ interval:
           on_response:
             then:
               - lambda: |-
-                  // Zamieniamy surowe bajty (vector) na normalny tekst (std::string)
-                  std::string resp_str(response.begin(), response.end());
+                  // Pobieramy treść odpowiedzi jako czysty tekst za pomocą wbudowanej metody get_string()
+                  std::string resp_str = response->get_string();
                   
-                  // Teraz bezpiecznie wyszukujemy temperaturę w tekście
+                  // Bezpiecznie wyszukujemy temperaturę w tekście
                   std::string search_str = "\"temperature_2m\":";
                   size_t pos = resp_str.find(search_str);
                   if (pos != std::string::npos) {
