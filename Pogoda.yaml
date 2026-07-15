@@ -1,29 +1,36 @@
 esphome:
   name: ekran-pogodowy
+  friendly_name: Ekran Pogodowy
 
 esp32:
   board: esp32-s3-devkitc-1
-  variant: esp32s3
   framework:
     type: esp-idf
 
+# Konfiguracja polaczenia Wi-Fi
 wifi:
-  ssid: "ESPtest"
+  ssid: "TUTAJ_WPISZ_NAZWE_SWOJEGO_WIFI"
   password: "12345678"
+  
+  # Automatyczny punkt dostepowy w razie awarii Wi-Fi
+  ap:
+    ssid: "Ekran-Pogodowy-Awaryjny"
 
-time:
-  - platform: sntp
-    id: czas_z_internetu
-    timezone: "Europe/Warsaw"
+# Aktywacja natywnego API dla Home Assistant
+api:
 
-weather:
+# Logowanie zdarzen (przydatne do debugowania)
+logger:
+
+# Komponent pobierajacy dane pogodowe z OpenWeatherMap
+text_sensor:
   - platform: openweathermap
     id: pogoda_z_sieci
-    api_key: "TUTAJ_WKLEJ_TWÓJ_KLUCZ_API"
+    api_key: "43f603e0b341be3dc59f463a6ea78716"
     latitude: 54.5392
     longitude: 17.7501
+    update_interval: 30min
 
+# Przykladowa sekcja wyswietlacza RGB dla Waveshare ESP32-S3
 display:
-  - platform: rgb565
-    id: my_display
-    # UWAGA: Tu w wolnej chwili uzupełnimy piny dla Twojej magistrali RGB w Waveshare.
+  - platform: esp32_camera
