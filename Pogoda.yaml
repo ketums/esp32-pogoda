@@ -15,7 +15,7 @@ wifi:
   ap:
     ssid: "Ekran-Pogodowy-Awaryjny"
 
-# Włączenie obsługi zapytań HTTP
+# Włączenie obsługi HTTP z automatycznym wsparciem dla JSON
 http_request:
   useragent: esphome/device
   timeout: 10s
@@ -25,31 +25,15 @@ logger:
 web_server:
   port: 80
 
-# Czujnik tekstowy na temperaturę
-text_sensor:
-  - platform: template
+# Czysty sensor, który pobiera temperaturę całkowicie automatycznie!
+sensor:
+  - platform: http_request
     name: "Temperatura zewnętrzna"
     id: temp_zewnetrzna
-
-# Skrypt pobierający dane co 15 minut i dekodujący JSON oficjalną metodą ESPHome
-interval:
-  - interval: 15min
-    then:
-      - http_request.get:
-          url: "https://api.open-meteo.com/v1/forecast?latitude=54.5392&longitude=17.7501&current=temperature_2m"
-          request_headers:
-            Accept: "application/json"
-          on_response:
-            then:
-              - json.parse:
-                  json: !lambda 'return response->get_string();' # Ta uproszczona lambda jest wbudowana i akceptowana przez ESPHome
-                  then:
-                    - lambda: |-
-                        if (root.containsKey("current")) {
-                          auto current = root["current"];
-                          if (current.containsKey("temperature_2m")) {
-                            float temp = current["temperature_2m"];
-                            id(temp_zewnetrzna).publish_state(str_snprintf("%.1f °C", 10, temp));
-                          }
-                        }
-                        
+    url: "https://api.open-meteo.com/v1/forecast?latitude=54.5392&longitude=17.7501&current=temperature_2m"
+    update_interval: 15min
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    # ESPHome sam wyciągnie wartość z JSON-a za pomocą tej ścieżki:
+    json_path: "$.current.temperature_2m"
+    
