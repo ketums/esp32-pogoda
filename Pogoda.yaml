@@ -11,10 +11,6 @@ esp32:
   board: esp32-s3-devkitc-1
   framework:
     type: esp-idf
-    sdkconfig_options:
-      # Wymuszenie obsługi pamięci Octal PSRAM dla płytki Waveshare ESP32-S3
-      CONFIG_SPIRAM_MODE_OCT: "y"
-      CONFIG_SPIRAM_TYPE_AUTO: "y"
 
 logger:
   level: INFO
@@ -22,18 +18,16 @@ logger:
 
 api:
   encryption:
-    key: "TU_WSTAW_KLUCZ_API"
+    key: "WPISZ_TUTAJ_SWOJ_KLUCZ_API"
 
 ota:
   - platform: esphome
-    password: "TU_WSTAW_HASLO_OTA"
+    password: "WPISZ_TUTAJ_SWOJE_HASLO_OTA"
 
 wifi:
-  # Automatyczne łączenie z Twoim hotspotem w telefonie
   ssid: "ESPTest"
   password: "12345678"
 
-  # Awaryjny hotspot rozgłaszany przez płytkę, gdy nie ma zasięgu
   ap:
     ssid: "Waveshare Dashboard Hotspot"
     password: "12345678"
@@ -49,7 +43,7 @@ time:
 
 sensor:
   - platform: wifi_signal
-    name: "Sila WiFi"
+    name: "Siła WiFi"
     update_interval: 60s
 
   - platform: uptime
@@ -64,4 +58,4 @@ globals:
   - id: current_page
     type: int
     restore_value: no
-    initial_value: '0'
+    initial_value: "0"
