@@ -2,11 +2,6 @@ esphome:
   name: waveshare-dashboard
   friendly_name: Waveshare Dashboard
 
-  on_boot:
-    priority: 600
-    then:
-      - logger.log: "Start panelu Waveshare Dashboard"
-
 esp32:
   board: esp32-s3-devkitc-1
   framework:
@@ -14,15 +9,12 @@ esp32:
 
 logger:
   level: INFO
-  baud_rate: 115200
 
 api:
-  encryption:
-    key: "WPISZ_TUTAJ_SWOJ_KLUCZ_API"
 
 ota:
   - platform: esphome
-    password: "WPISZ_TUTAJ_SWOJE_HASLO_OTA"
+    password: "12345678"
 
 wifi:
   ssid: "ESPTest"
