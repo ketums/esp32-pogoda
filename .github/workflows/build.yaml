@@ -16,11 +16,26 @@ jobs:
           python -m pip install --upgrade pip
           pip install esphome
 
-      - name: Kompilacja pliku konfiguracyjnego
+      - name: Kompilacja
         run: esphome compile Pogoda.yaml
 
-      - name: Udostępnienie pliku BIN
+      - name: Znajdź firmware.bin
+        run: |
+          echo "Szukam firmware.bin..."
+          find . -type f -name "firmware.bin"
+          FILE=$(find . -type f -name "firmware.bin" | head -n 1)
+
+          if [ -z "$FILE" ]; then
+            echo "Nie znaleziono firmware.bin!"
+            exit 1
+          fi
+
+          echo "Znaleziono: $FILE"
+          mkdir -p output
+          cp "$FILE" output/firmware.bin
+
+      - name: Udostępnienie firmware
         uses: actions/upload-artifact@v4
         with:
           name: firmware
-          path: .esphome/build/waveshare-dashboard/.pioenvs/waveshare-dashboard/firmware.bin
+          path: output/firmware.bin
